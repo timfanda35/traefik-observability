@@ -1,0 +1,47 @@
+version: '3'
+services:
+  traefik:
+    image: traefik:v2.5
+    command:
+      - --api.insecure=true
+      - --providers.docker
+      - --metrics.prometheus=true
+      - --metrics.prometheus.addEntryPointsLabels=true # Default=true
+      - --metrics.prometheus.addrouterslabels=true     # Default=false
+      - --metrics.prometheus.addServicesLabels=true    # Default=true
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  nginx:
+    image: nginx
+    labels:
+      - "traefik.http.routers.nginx.rule=PathPrefix(`/`)"
+      - "traefik.http.services.nginx.loadbalancer.server.port=80"
+  # Observability
+  prometheus:
+    image: prom/prometheus:v2.36.1
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+    ports:
+      - 9090:9090
+    depends_on:
+      - traefik
+  grafana:
+    image: grafana/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=foobar
+      - GF_USERS_ALLOW_SIGN_UP=false
+    user: "472"
+    volumes:
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
