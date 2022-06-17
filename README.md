@@ -28,9 +28,13 @@ watch curl -s localhost
 
 http://localhost:8080
 
+![](./screenshots/traefik-dashboard.jpg)
+
 ## Prometheus
 
 http://localhost:9090
+
+![](./screenshots/prometheus-web-ui.jpg)
 
 ## Grafana 
 
@@ -42,6 +46,10 @@ password: `foobar`
 Provisioned Dashboards:
 - Prometheus 2.0 Stats
 - [Traefik](https://grafana.com/grafana/dashboards/4475)
+
+![](./screenshots/grafana-dashboard-prometheus.jpg)
+
+![](./screenshots/grafana-dashboard-traefik.jpg)
 
 ## Stop containers
 
